@@ -1,0 +1,3 @@
+name: DogPatrol
+version: '1.0-SNAPSHOT'
+main: com.nekozouneko.dogPatrol.DogPatrol
