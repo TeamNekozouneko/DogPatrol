@@ -8,7 +8,10 @@ class DuplicateContent : ChatEvent.CheckHandler {
     companion object{
         const val BASE_BUFFER = 3
     }
-    @DogPatrol.CheckInfo(checkName = "DuplicateContent")
+    @DogPatrol.CheckInfo(
+        checkName = "DuplicateContent",
+        blockedMessage = "同じ内容を連続して送信しないでください！"
+    )
     override fun handle(profile: ProfileManager, content: String) : Boolean{
         val lastContent = profile.getVariable("lastContent")
         if(lastContent == null) return true
