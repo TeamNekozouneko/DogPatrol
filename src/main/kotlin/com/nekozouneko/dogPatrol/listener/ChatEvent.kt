@@ -36,8 +36,8 @@ class ChatEvent : Listener {
             val annotation = kFunction?.annotations?.find { it is DogPatrol.CheckInfo } as? DogPatrol.CheckInfo
             if(annotation == null) continue
 
-            profile.getPlayer().sendMessage("§7[§6DogPatrol§7] §c${annotation.blockedMessage}")
-            utils.sendNotify("§7[§6DogPatrol§7] §f${profile.getPlayer()}§7の発言が §f${annotation.checkName} §7によりブロックされました。（内容：§f${e.message}§7）")
+            profile.getPlayer().sendMessage("§6§lDogPatrol §7>> §c${annotation.blockedMessage}")
+            utils.sendNotify("§6§lDogPatrol §7>> §f${profile.getPlayer()}§7の発言が §f${annotation.checkName} §7によりブロックされました。（内容：§f${e.message}§7）")
             e.isCancelled = true
             break
         }
