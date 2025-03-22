@@ -41,6 +41,6 @@ class ChatEvent : Listener {
             break
         }
 
-        profile.setVariable("lastContent", e.message)
+        profile.addContent(e.message)
     }
 }

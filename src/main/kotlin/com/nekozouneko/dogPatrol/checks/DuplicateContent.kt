@@ -13,8 +13,7 @@ class DuplicateContent : ChatEvent.CheckHandler {
         blockedMessage = "同じ内容を連続して送信しないでください！"
     )
     override fun handle(profile: ProfileManager, content: String) : Boolean{
-        val lastContent = profile.getVariable("lastContent")
-        if(lastContent == null) return true
+        val lastContent = profile.getContents()[0]
 
         if(lastContent == content){
             profile.addBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT, 1.0f)
