@@ -6,7 +6,7 @@ import com.nekozouneko.dogPatrol.manager.ProfileManager
 
 class DuplicateContent : ChatEvent.CheckHandler {
     companion object{
-        const val BASE_BUFFER = 3
+        const val BASE_BUFFER = 2
     }
     @DogPatrol.CheckInfo(
         checkName = "DuplicateContent",
@@ -22,7 +22,7 @@ class DuplicateContent : ChatEvent.CheckHandler {
             profile.removeBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT, 0.2f)
         }
 
-        if(lastContent == content && profile.getBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT) > BASE_BUFFER) return false
+        if(lastContent == content && profile.getBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT) >= BASE_BUFFER) return false
         return true
     }
 }
