@@ -35,7 +35,6 @@ class DogPatrol : Plugin() {
             connectionManager.integrationCheckHandle()
             connectionManager.getAllProfiles().forEach {
                 it.profileTickHandle()
-                it.getPlayer().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("${it.getBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT)}"))
             }
         }, 0, 1, TimeUnit.SECONDS)
 
