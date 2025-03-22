@@ -36,4 +36,8 @@ class ProfileManager(private val player: ProxiedPlayer) {
     fun getContents() : List<String>{
         return lastContents.toList()
     }
+    fun getLastContent() : String?{
+        if(lastContents.size == 0) return null
+        return lastContents.last()
+    }
 }
