@@ -8,7 +8,6 @@ import com.nekozouneko.dogPatrol.manager.ProfileManager
 import net.md_5.bungee.api.event.ChatEvent
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.event.EventHandler
-import sun.java2d.cmm.Profile
 
 class ChatEvent : Listener {
     private val utils: Utils = DogPatrol.getUtils()
