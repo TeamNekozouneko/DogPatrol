@@ -2,7 +2,7 @@ package com.nekozouneko.dogPatrol.listener
 
 import com.nekozouneko.dogPatrol.DogPatrol
 import com.nekozouneko.dogPatrol.utils.Utils
-import com.nekozouneko.dogPatrol.checks.DuplicateContent
+import com.nekozouneko.dogPatrol.checks.*
 import com.nekozouneko.dogPatrol.manager.ConnectionManager
 import com.nekozouneko.dogPatrol.manager.ProfileManager
 import net.md_5.bungee.api.event.ChatEvent
@@ -15,7 +15,8 @@ class ChatEvent : Listener {
 
     companion object {
         val checks: ArrayList<CheckHandler> = arrayListOf(
-            DuplicateContent()
+            DuplicateContent(),
+            SimilarityContent()
         )
     }
     interface CheckHandler {

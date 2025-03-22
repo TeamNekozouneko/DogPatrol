@@ -39,9 +39,18 @@ class Utils {
         }
         return T[m][n]
     }
-    fun getLevenshteinDistanceRatio(x: String, y: String): Double {
-        val maxLength = max(x.length, y.length)
-        if (maxLength > 0) return (maxLength * 1.0 - getLevenshteinDistance(x, y)) / maxLength * 1.0
-        return 1.0
+    fun getLevenshteinDistanceAverageRatio(contents: List<String>) : Double {
+        if(contents.size <= 1) return 0.0
+
+        var totalMaxLength = 0
+        var totalDistance = 0
+        for (i in 0..<contents.size-1){
+            val x = contents[i]
+            val y = contents[i+1]
+            val maxLength = max(x.length, y.length)
+            totalMaxLength += maxLength
+            totalDistance += maxLength - getLevenshteinDistance(x, y)
+        }
+        return totalDistance.toDouble() / totalMaxLength
     }
 }

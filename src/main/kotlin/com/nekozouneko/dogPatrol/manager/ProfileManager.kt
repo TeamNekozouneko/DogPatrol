@@ -14,10 +14,12 @@ class ProfileManager(private val player: ProxiedPlayer) {
 
     fun getPlayer() : ProxiedPlayer { return player }
     enum class BufferType{
-        DUPLICATE_CONTENT
+        DUPLICATE_CONTENT,
+        SIMILARITY_CONTENT
     }
     fun profileTickHandle(){
         removeBuffer(BufferType.DUPLICATE_CONTENT, 0.02f)
+        removeBuffer(BufferType.SIMILARITY_CONTENT, 0.02f)
     }
     fun setBuffer(type: BufferType, value: Float){
         buffer.compute(type) { _, _ -> value }
