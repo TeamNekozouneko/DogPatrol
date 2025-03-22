@@ -30,5 +30,8 @@ class ConnectionManager : Listener{
     fun removeConnection(connection: Connection){
         connectionMap.remove(connection)
     }
+    fun getAllProfiles() : MutableCollection<ProfileManager> {
+        return connectionMap.values
+    }
 
 }

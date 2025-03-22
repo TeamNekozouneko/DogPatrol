@@ -15,11 +15,7 @@ class DuplicateContent : ChatEvent.CheckHandler {
     override fun handle(profile: ProfileManager, content: String) : Boolean{
         val lastContent = profile.getLastContent() ?: return true
 
-        if(lastContent == content){
-            profile.addBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT, 1.0f)
-        }else{
-            profile.removeBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT, 0.2f)
-        }
+        if(lastContent == content) profile.addBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT, 1.0f)
 
         if(lastContent == content && profile.getBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT) >= BASE_BUFFER) return false
         return true

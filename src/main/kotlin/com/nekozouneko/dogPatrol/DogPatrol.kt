@@ -5,7 +5,11 @@ import com.nekozouneko.dogPatrol.listener.ChatEvent
 import com.nekozouneko.dogPatrol.listener.PlayerDisconnectEvent
 import com.nekozouneko.dogPatrol.listener.PostLoginEvent
 import com.nekozouneko.dogPatrol.manager.ConnectionManager
+import com.nekozouneko.dogPatrol.manager.ProfileManager
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.plugin.Plugin
+import org.w3c.dom.Text
 import java.sql.Connection
 import java.util.concurrent.TimeUnit
 
@@ -29,6 +33,10 @@ class DogPatrol : Plugin() {
 
         proxy.scheduler.schedule(this, Runnable {
             connectionManager.integrationCheckHandle()
+            connectionManager.getAllProfiles().forEach {
+                it.profileTickHandle()
+                it.getPlayer().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("${it.getBuffer(ProfileManager.BufferType.DUPLICATE_CONTENT)}"))
+            }
         }, 0, 1, TimeUnit.SECONDS)
 
     }

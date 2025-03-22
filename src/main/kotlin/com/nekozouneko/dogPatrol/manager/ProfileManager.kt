@@ -16,6 +16,9 @@ class ProfileManager(private val player: ProxiedPlayer) {
     enum class BufferType{
         DUPLICATE_CONTENT
     }
+    fun profileTickHandle(){
+        removeBuffer(BufferType.DUPLICATE_CONTENT, 0.02f)
+    }
     fun setBuffer(type: BufferType, value: Float){
         buffer.compute(type) { _, _ -> value }
     }
