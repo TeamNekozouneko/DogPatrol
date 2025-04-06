@@ -16,7 +16,8 @@ class ChatEvent : Listener {
     companion object {
         val checks: ArrayList<CheckHandler> = arrayListOf(
             DuplicateContent(),
-            SimilarityContent()
+            SimilarityContent(),
+            ContainsBadwords()
         )
     }
     interface CheckHandler {
