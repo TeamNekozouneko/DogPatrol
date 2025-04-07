@@ -52,7 +52,7 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
 
 
         //Get Badwords
-        val badwordConfig = ContainsBadwords.config.getBadwords()
+        val badwordConfig = DogPatrol.getConfigurationManager().getBadwords()
         val badwords = badwordConfig.keys.map { badwordConfig.getSection(it).getStringList("list") }.flatten()
 
         //Calcultion all Morphological based Combination pattern
@@ -77,7 +77,6 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
 
         //Check Combination contains Badwords
         resultCombination.forEach { _combination ->
-            profile.getPlayer().sendMessage(_combination)
             badwords.forEach {
                 if(_combination.contains(it)) return false
             }
