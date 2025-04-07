@@ -1,5 +1,6 @@
 package com.nekozouneko.dogPatrol
 
+import com.nekozouneko.dogPatrol.commands.DogPatrolCommand
 import com.nekozouneko.dogPatrol.utils.Utils
 import com.nekozouneko.dogPatrol.listener.ChatEvent
 import com.nekozouneko.dogPatrol.listener.PlayerDisconnectEvent
@@ -42,6 +43,8 @@ class DogPatrol : Plugin() {
         proxy.pluginManager.registerListener(this, PostLoginEvent())
         proxy.pluginManager.registerListener(this, PlayerDisconnectEvent())
         proxy.pluginManager.registerListener(this, ChatEvent())
+
+        proxy.pluginManager.registerCommand(this, DogPatrolCommand())
 
         proxy.scheduler.schedule(this, Runnable {
             connectionManager.integrationCheckHandle()
