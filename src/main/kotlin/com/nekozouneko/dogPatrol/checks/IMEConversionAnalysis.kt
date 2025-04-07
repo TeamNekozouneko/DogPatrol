@@ -6,6 +6,7 @@ import com.nekozouneko.dogPatrol.manager.ProfileManager
 import com.atilika.kuromoji.ipadic.Tokenizer
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.nekozouneko.dogPatrol.utils.Utils
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,7 +24,7 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
         isAsync = true
     )
     override fun handle(profile: ProfileManager, content: String): Boolean {
-        //前処理
+        //前処理（記号除去）
         val replacedContent = content.replace(Regex("\\p{Punct}")  , "")
 
         //Tokenize
@@ -34,16 +35,21 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
 
         //Hiragana IME Convert (Google API)
         val requestUrl = "http://www.google.com/transliterate?langpair=ja-Hira|ja&text="
+        var candidates: List<JsonElement> = listOf()
+        try{
+            val url = URL(requestUrl + URLEncoder.encode(hiragana , "UTF-8"))
+            val urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.requestMethod = "GET"
+            urlConnection.connect()
+            val br = BufferedReader(InputStreamReader(urlConnection.inputStream))
+            val response = br.readText()
+            val json = Gson().fromJson(response, JsonArray::class.java).asJsonArray
+            candidates = json.map { it.asJsonArray.get(1) }
+        }catch(e: Exception){
+            e.printStackTrace()
+            return true
+        }
 
-        val url = URL(requestUrl + URLEncoder.encode(replacedContent , "UTF-8"))
-        val urlConnection = url.openConnection() as HttpURLConnection
-        urlConnection.requestMethod = "GET"
-        urlConnection.connect()
-        val br = BufferedReader(InputStreamReader(urlConnection.inputStream))
-        val response = br.readText()
-
-        val json = Gson().fromJson(response, JsonArray::class.java).asJsonArray
-        val candidates = json.map { it.asJsonArray.get(1) }
 
         //Get Badwords
         val badwordConfig = ContainsBadwords.config.getBadwords()
@@ -71,6 +77,7 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
 
         //Check Combination contains Badwords
         resultCombination.forEach { _combination ->
+            profile.getPlayer().sendMessage(_combination)
             badwords.forEach {
                 if(_combination.contains(it)) return false
             }
