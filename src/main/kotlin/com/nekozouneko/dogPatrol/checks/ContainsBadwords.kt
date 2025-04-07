@@ -1,6 +1,5 @@
 package com.nekozouneko.dogPatrol.checks
 
-import com.atilika.kuromoji.ipadic.Tokenizer
 import com.nekozouneko.dogPatrol.DogPatrol
 import com.nekozouneko.dogPatrol.listener.ChatEvent
 import com.nekozouneko.dogPatrol.manager.ProfileManager
@@ -11,7 +10,8 @@ class ContainsBadwords : ChatEvent.CheckHandler {
     }
     @DogPatrol.CheckInfo(
         checkName = "ContainsBadwords",
-        blockedMessage = "不適切な内容を含むチャットを送信しないでください！"
+        blockedMessage = "不適切な内容を含むチャットを送信しないでください！",
+        isAsync = false
     )
     override fun handle(profile: ProfileManager, content: String): Boolean {
         val badwordConfig = config.getBadwords()

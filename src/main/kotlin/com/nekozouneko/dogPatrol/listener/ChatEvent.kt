@@ -10,14 +10,14 @@ import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.event.EventHandler
 
 class ChatEvent : Listener {
-    private val utils: Utils = DogPatrol.getUtils()
     private val connectionManager: ConnectionManager = DogPatrol.getConnectionManager()
 
     companion object {
         val checks: ArrayList<CheckHandler> = arrayListOf(
             DuplicateContent(),
             SimilarityContent(),
-            ContainsBadwords()
+            ContainsBadwords(),
+            IMEConversionAnalysis()
         )
     }
     interface CheckHandler {
@@ -30,17 +30,28 @@ class ChatEvent : Listener {
         val profile: ProfileManager = connectionManager.getProfile(e.sender) ?: return
 
         for(check in checks){
-            if(check.handle(profile, e.message)) continue
-
             //Get Annotations
             val kFunction = check::class.members.find { it.name == "handle" }
             val annotation = kFunction?.annotations?.find { it is DogPatrol.CheckInfo } as? DogPatrol.CheckInfo
             if(annotation == null) continue
 
-            profile.getPlayer().sendMessage("§6§lDogPatrol §7>> §c${annotation.blockedMessage}")
-            utils.sendNotify("§6§lDogPatrol §7>> §f${profile.getPlayer()}§7の発言が §f${annotation.checkName} §7によりブロックされました。（内容：§f${e.message}§7）")
-            e.isCancelled = true
-            break
+            if(!annotation.isAsync){
+                //Sync Process
+                if(check.handle(profile, e.message)) continue
+
+                profile.getPlayer().sendMessage("§6§lDogPatrol §7>> §c${annotation.blockedMessage}")
+                Utils.sendNotify("§6§lDogPatrol §7>> §f${profile.getPlayer()}§7の発言が §f${annotation.checkName} §7によりブロックされました。（内容：§f${e.message}§7）")
+                e.isCancelled = true
+                break
+            }else{
+                //Async process
+                DogPatrol.instance.proxy.scheduler.runAsync(DogPatrol.instance, Runnable {
+                    if(e.isCancelled) return@Runnable
+                    if(check.handle(profile, e.message)) return@Runnable
+                    if(!e.isCancelled) Utils.sendNotify("§6§lDogPatrol §7>> §f${profile.getPlayer()}§7の不適切な発言が §f${annotation.checkName} §7により検出されました。（内容：§f${e.message}§7）")
+                })
+            }
+
         }
 
         profile.addContent(e.message)

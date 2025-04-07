@@ -59,5 +59,5 @@ class DogPatrol : Plugin() {
     //Annotations
     @Target(AnnotationTarget.FUNCTION)
     @Retention(AnnotationRetention.RUNTIME)
-    annotation class CheckInfo(val checkName: String, val blockedMessage: String)
+    annotation class CheckInfo(val checkName: String, val blockedMessage: String, val isAsync: Boolean)
 }
