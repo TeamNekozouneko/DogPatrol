@@ -13,6 +13,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import kotlinx.coroutines.*
+import com.nekozouneko.dogPatrol.utils.RomaHiraConverter
 
 class IMEConversionAnalysis : ChatEvent.CheckHandler{
     companion object{
@@ -24,8 +26,13 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
         isAsync = true
     )
     override fun handle(profile: ProfileManager, content: String): Boolean {
-        //前処理（記号除去）
-        val replacedContent = content.replace(Regex("\\p{Punct}")  , "")
+        //前処理
+        var replacedContent = RomaHiraConverter.convert(content.lowercase())
+        replacedContent = replacedContent.replace(Regex("\\p{Punct}")  , "")
+        replacedContent = replacedContent.replace(" ","").replace("　","")
+        DogPatrol.instance.proxy.players.forEach {
+            it.sendMessage(replacedContent)
+        }
 
         //Tokenize
         val tokenizer = Tokenizer()
@@ -46,7 +53,6 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
             val json = Gson().fromJson(response, JsonArray::class.java).asJsonArray
             candidates = json.map { it.asJsonArray.get(1) }
         }catch(e: Exception){
-            e.printStackTrace()
             return true
         }
 
@@ -56,6 +62,19 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
         val badwords = badwordConfig.keys.map { badwordConfig.getSection(it).getStringList("list") }.flatten()
 
         //Calcultion all Morphological based Combination pattern
+        val resultCombination = runBlocking { calculateCombinationPatterns(candidates) }
+
+        //Check Combination contains Badwords
+        resultCombination.forEach { _combination ->
+            badwords.forEach {
+                if(_combination.contains(it)) return false
+            }
+        }
+
+        return true
+    }
+
+    suspend fun calculateCombinationPatterns(candidates: List<JsonElement>) : List<String>{
         var resultCombination: MutableList<String> = mutableListOf()
         for(candidateIndex in candidates.indices){
             if(candidateIndex == 0) {
@@ -70,19 +89,12 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
                 candidates[candidateIndex].asJsonArray.forEachIndexed { index, it ->
                     if(index > CANDIDATE_DEPTH) return@forEachIndexed
                     _combination.add(currentCombination + it.asString)
+                    delay(1)
                 }
             }
             resultCombination = _combination
         }
-
-        //Check Combination contains Badwords
-        resultCombination.forEach { _combination ->
-            badwords.forEach {
-                if(_combination.contains(it)) return false
-            }
-        }
-
-        return true
+        return resultCombination
     }
 
 }

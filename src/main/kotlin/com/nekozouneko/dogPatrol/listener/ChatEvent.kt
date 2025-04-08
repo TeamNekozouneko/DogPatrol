@@ -12,14 +12,6 @@ import net.md_5.bungee.event.EventHandler
 class ChatEvent : Listener {
     private val connectionManager: ConnectionManager = DogPatrol.getConnectionManager()
 
-    companion object {
-        val checks: ArrayList<CheckHandler> = arrayListOf(
-            DuplicateContent(),
-            SimilarityContent(),
-            ContainsBadwords(),
-            IMEConversionAnalysis()
-        )
-    }
     interface CheckHandler {
         fun handle(profile: ProfileManager, content: String) : Boolean
     }
@@ -28,6 +20,13 @@ class ChatEvent : Listener {
         if(e.isCommand || e.isProxyCommand) return
 
         val profile: ProfileManager = connectionManager.getProfile(e.sender) ?: return
+
+        val checks: ArrayList<CheckHandler> = arrayListOf(
+            DuplicateContent(),
+            SimilarityContent(),
+            ContainsBadwords(),
+            IMEConversionAnalysis()
+        )
 
         for(check in checks){
             //Get Annotations
