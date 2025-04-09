@@ -25,13 +25,18 @@ class SimilarityContent : CheckManager.CheckHandler {
     override fun handle(profile: ProfileManager, content: String): Boolean {
         chatContent = content
         profileManager = profile
+        responseData["baseRatio"] = BASE_RATIO.toString()
+        responseData["baseBuffer"] = BASE_BUFFER.toString()
         if(content.length <= MIN_CONTENT_LENGTH) return true
         val contents = profile.getContents()
 
         val distances = Utils.getLevenshteinDistanceAverageRatio(contents)
+        responseData["levenshteinDistanceAvgRatio"] = distances.toString()
         if(distances >= BASE_RATIO) profile.addBuffer(ProfileManager.BufferType.SIMILARITY_CONTENT, 1.0f)
 
-        if(distances >= BASE_RATIO && profile.getBuffer(ProfileManager.BufferType.SIMILARITY_CONTENT) >= BASE_BUFFER) return false
+        val currentBuffer = profile.getBuffer(ProfileManager.BufferType.SIMILARITY_CONTENT)
+        responseData["currentBuffer"] = currentBuffer.toString()
+        if(distances >= BASE_RATIO && currentBuffer >= BASE_BUFFER) return false
         return true
     }
 }

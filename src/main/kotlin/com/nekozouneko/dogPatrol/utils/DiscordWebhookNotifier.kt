@@ -43,6 +43,7 @@ class DiscordWebhookNotifier {
                     }
                   ],
                   "username": "DogPatrol",
+                  "avatar_url": "https://i.imgur.com/CTqNOLp.jpeg",
                   "attachments": []
                 }
             """.trimIndent()
@@ -71,6 +72,7 @@ class DiscordWebhookNotifier {
                     }
                   ],
                   "username": "DogPatrol",
+                  "avatar_url": "https://i.imgur.com/CTqNOLp.jpeg",
                   "attachments": []
                 }
             """.trimIndent()
