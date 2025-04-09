@@ -15,6 +15,8 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlinx.coroutines.*
 import com.nekozouneko.dogPatrol.utils.RomaHiraConverter
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 
 class IMEConversionAnalysis : CheckManager.CheckHandler{
     lateinit var chatContent: String
@@ -65,49 +67,50 @@ class IMEConversionAnalysis : CheckManager.CheckHandler{
             return true
         }
 
+        //Calcultion all Morphological based Combination patterns
+        val startedCalculationTime = System.currentTimeMillis()
+        try {
+            val isCombinationPatternsBad = runBlocking { isCombinationPatternsBad(candidates) }
+            responseData["morphCalculationTime"] = "${( System.currentTimeMillis() - startedCalculationTime )}ms"
+            if (isCombinationPatternsBad) return false
+        }catch(_: Exception){}
+        return true
+    }
 
+    suspend fun isCombinationPatternsBad(candidates: List<JsonElement>) : Boolean{
         //Get Badwords
         val badwordConfig = DogPatrol.getConfigurationManager().getBadwords()
         val badwords = badwordConfig.keys.map { badwordConfig.getSection(it).getStringList("list") }.flatten()
 
-        //Calcultion all Morphological based Combination pattern
-        val startedCalculationTime = System.currentTimeMillis()
-        val resultCombination = runBlocking { calculateCombinationPatterns(candidates) }
-        responseData["morphCalculationTime"] = "${( System.currentTimeMillis() - startedCalculationTime )}ms"
-
-        //Check Combination contains Badwords
-        for (combination in resultCombination){
-            for (badword in badwords){
-                if(!combination.contains(badword)) continue
-                responseData["detectedCombination"] = combination
-                return false
-            }
-        }
-
-        return true
-    }
-
-    suspend fun calculateCombinationPatterns(candidates: List<JsonElement>) : List<String>{
         var resultCombination: MutableList<String> = mutableListOf()
         for(candidateIndex in candidates.indices){
+            val _combination: MutableList<String> = mutableListOf()
             if(candidateIndex == 0) {
                 candidates[0].asJsonArray.forEachIndexed { index, it ->
                     if(index > CANDIDATE_DEPTH) return@forEachIndexed
                     resultCombination.add(it.asString)
                 }
-                continue
+            }else{
+                resultCombination.forEach { currentCombination ->
+                    candidates[candidateIndex].asJsonArray.forEachIndexed { index, it ->
+                        if(index >= CANDIDATE_DEPTH) return@forEachIndexed
+                        _combination.add(arrayListOf(currentCombination, it.asString).joinToString(""))
+                        DogPatrol.instance.proxy.players.forEach { it.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(currentCombination)) }
+                        if(_combination.size % 10 == 0) delay(1)
+                    }
+                }
+                resultCombination = _combination
             }
-            val _combination: MutableList<String> = mutableListOf()
-            resultCombination.forEach { currentCombination ->
-                candidates[candidateIndex].asJsonArray.forEachIndexed { index, it ->
-                    if(index > CANDIDATE_DEPTH) return@forEachIndexed
-                    _combination.add(currentCombination + it.asString)
-                    delay(1)
+            for (combination in resultCombination){
+                for (badword in badwords){
+                    if(!combination.contains(badword)) continue
+                    responseData["detectedCombination"] = combination
+                    responseData["detectedBadword"] = badword
+                    return true
                 }
             }
-            resultCombination = _combination
         }
-        return resultCombination
+        return false
     }
 
 }
