@@ -95,7 +95,6 @@ class IMEConversionAnalysis : CheckManager.CheckHandler{
                     candidates[candidateIndex].asJsonArray.forEachIndexed { index, it ->
                         if(index >= CANDIDATE_DEPTH) return@forEachIndexed
                         _combination.add(arrayListOf(currentCombination, it.asString).joinToString(""))
-                        DogPatrol.instance.proxy.players.forEach { it.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(currentCombination)) }
                         if(_combination.size % 10 == 0) delay(1)
                     }
                 }

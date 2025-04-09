@@ -5,10 +5,7 @@ import com.nekozouneko.dogPatrol.utils.Utils
 import com.nekozouneko.dogPatrol.listener.ChatEvent
 import com.nekozouneko.dogPatrol.listener.PlayerDisconnectEvent
 import com.nekozouneko.dogPatrol.listener.PostLoginEvent
-import com.nekozouneko.dogPatrol.manager.CheckManager
-import com.nekozouneko.dogPatrol.manager.ConfigurationManager
-import com.nekozouneko.dogPatrol.manager.ConnectionManager
-import com.nekozouneko.dogPatrol.manager.ProfileManager
+import com.nekozouneko.dogPatrol.manager.*
 import com.nekozouneko.dogPatrol.utils.DiscordWebhookNotifier
 import net.md_5.bungee.api.ChatMessageType
 import net.md_5.bungee.api.chat.TextComponent
@@ -26,23 +23,26 @@ class DogPatrol : Plugin() {
     companion object{
         lateinit var instance: DogPatrol
 
-        private val utils: Utils = Utils()
+        private val annotationManager: AnnotationManager = AnnotationManager()
         private val connectionManager: ConnectionManager = ConnectionManager()
         private val configurationManager: ConfigurationManager = ConfigurationManager()
         private val checkManager: CheckManager = CheckManager()
-
-        fun getUtils(): Utils { return this.utils }
-        fun getConnectionManager(): ConnectionManager { return this.connectionManager }
-        fun getConfigurationManager(): ConfigurationManager { return this.configurationManager }
-        fun getCheckManager(): CheckManager { return this.checkManager }
+        fun getAnnotationManager() : AnnotationManager { return annotationManager }
+        fun getConnectionManager(): ConnectionManager { return connectionManager }
+        fun getConfigurationManager(): ConfigurationManager { return configurationManager }
+        fun getCheckManager(): CheckManager { return checkManager }
     }
 
     override fun onEnable() {
         instance = this
 
+        //Init All Annotations
+        annotationManager.initialize()
+
         //Init Configuration
         configurationManager.initialize()
         configurationManager.loadConfig()
+
 
         proxy.pluginManager.registerListener(this, PostLoginEvent())
         proxy.pluginManager.registerListener(this, PlayerDisconnectEvent())

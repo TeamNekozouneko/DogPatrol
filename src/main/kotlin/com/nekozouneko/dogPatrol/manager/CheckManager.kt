@@ -7,12 +7,15 @@ import com.nekozouneko.dogPatrol.checks.IMEConversionAnalysis
 import com.nekozouneko.dogPatrol.checks.SimilarityContent
 import com.nekozouneko.dogPatrol.utils.Utils
 import com.nekozouneko.dogPatrol.checks.*
+import com.nekozouneko.dogPatrol.models.Checks
 import com.nekozouneko.dogPatrol.utils.DiscordWebhookNotifier
 import net.md_5.bungee.api.event.ChatEvent
 
 class CheckManager {
     private val connectionManager = DogPatrol.getConnectionManager()
     private val discordWebhookNotifier = DiscordWebhookNotifier()
+    private val annotationManager = DogPatrol.getAnnotationManager()
+
     interface CheckHandler {
         fun handle(profile: ProfileManager, content: String) : Boolean
         fun getProfile() : ProfileManager
@@ -22,18 +25,14 @@ class CheckManager {
     fun check(e: ChatEvent){
         val profile: ProfileManager = connectionManager.getProfile(e.sender) ?: return
 
-        val checks: ArrayList<CheckHandler> = arrayListOf(
-            DuplicateContent(),
-            SimilarityContent(),
-            ContainsBadwords(),
-            IMEConversionAnalysis()
-        )
-
+        val checks: ArrayList<CheckHandler> = Checks.get()
         for(check in checks){
-            //Get Annotations
-            val kFunction = check::class.members.find { it.name == "handle" }
-            val annotation = kFunction?.annotations?.find { it is DogPatrol.CheckInfo } as? DogPatrol.CheckInfo
-            if(annotation == null) continue
+            val annotation = annotationManager.getAnnotation(check::class)
+            if(annotation == null){
+                DogPatrol.instance.logger.severe(check.toString())
+                DogPatrol.instance.logger.severe(annotationManager.toString())
+                continue
+            }
 
             if(!annotation.isAsync){
                 //Sync Process
