@@ -182,7 +182,7 @@ public final class RomaHiraConverter {
 
         MAP_TEMP.put("sya", "しゃ");
         MAP_TEMP.put("syi", "しぃ");
-        MAP_TEMP.put("syu", "しぅ");
+        MAP_TEMP.put("syu", "しゅ");
         MAP_TEMP.put("sye", "しぇ");
         MAP_TEMP.put("syo", "しょ");
 

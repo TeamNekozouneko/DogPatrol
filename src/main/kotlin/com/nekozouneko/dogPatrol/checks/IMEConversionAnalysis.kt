@@ -1,7 +1,7 @@
 package com.nekozouneko.dogPatrol.checks
 
 import com.nekozouneko.dogPatrol.DogPatrol
-import com.nekozouneko.dogPatrol.listener.ChatEvent
+import com.nekozouneko.dogPatrol.manager.CheckManager
 import com.nekozouneko.dogPatrol.manager.ProfileManager
 import com.atilika.kuromoji.ipadic.Tokenizer
 import com.google.gson.Gson
@@ -16,7 +16,13 @@ import java.net.URLEncoder
 import kotlinx.coroutines.*
 import com.nekozouneko.dogPatrol.utils.RomaHiraConverter
 
-class IMEConversionAnalysis : ChatEvent.CheckHandler{
+class IMEConversionAnalysis : CheckManager.CheckHandler{
+    lateinit var chatContent: String
+    lateinit var profileManager: ProfileManager
+    private val responseData: MutableMap<String, String> = mutableMapOf()
+    override fun getContent(): String { return chatContent }
+    override fun getProfile(): ProfileManager { return profileManager }
+    override fun getResponseData(): MutableMap<String, String> { return responseData }
     companion object{
         const val CANDIDATE_DEPTH = 3
     }
@@ -26,19 +32,22 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
         isAsync = true
     )
     override fun handle(profile: ProfileManager, content: String): Boolean {
+        chatContent = content
+        profileManager = profile
+        responseData["candidateDepth"] = CANDIDATE_DEPTH.toString()
+
         //前処理
         var replacedContent = RomaHiraConverter.convert(content.lowercase())
         replacedContent = replacedContent.replace(Regex("\\p{Punct}")  , "")
         replacedContent = replacedContent.replace(" ","").replace("　","")
-        DogPatrol.instance.proxy.players.forEach {
-            it.sendMessage(replacedContent)
-        }
+        responseData["preprocessedContent"] = replacedContent
 
         //Tokenize
         val tokenizer = Tokenizer()
         val rawTokens = tokenizer.tokenize(replacedContent)
         val katakana = rawTokens.joinToString("") { if (it.reading == "*") it.surface else it.reading }
         val hiragana = Utils.KatakanaToHiragana(katakana)
+        responseData["processedContent"] = hiragana
 
         //Hiragana IME Convert (Google API)
         val requestUrl = "http://www.google.com/transliterate?langpair=ja-Hira|ja&text="
@@ -62,12 +71,16 @@ class IMEConversionAnalysis : ChatEvent.CheckHandler{
         val badwords = badwordConfig.keys.map { badwordConfig.getSection(it).getStringList("list") }.flatten()
 
         //Calcultion all Morphological based Combination pattern
+        val startedCalculationTime = System.currentTimeMillis()
         val resultCombination = runBlocking { calculateCombinationPatterns(candidates) }
+        responseData["morphCalculationTime"] = "${( System.currentTimeMillis() - startedCalculationTime )}ms"
 
         //Check Combination contains Badwords
-        resultCombination.forEach { _combination ->
-            badwords.forEach {
-                if(_combination.contains(it)) return false
+        for (combination in resultCombination){
+            for (badword in badwords){
+                if(!combination.contains(badword)) continue
+                responseData["detectedCombination"] = combination
+                return false
             }
         }
 

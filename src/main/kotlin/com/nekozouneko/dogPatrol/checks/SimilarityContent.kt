@@ -1,11 +1,17 @@
 package com.nekozouneko.dogPatrol.checks
 
 import com.nekozouneko.dogPatrol.DogPatrol
-import com.nekozouneko.dogPatrol.listener.ChatEvent
+import com.nekozouneko.dogPatrol.manager.CheckManager
 import com.nekozouneko.dogPatrol.manager.ProfileManager
 import com.nekozouneko.dogPatrol.utils.Utils
 
-class SimilarityContent : ChatEvent.CheckHandler {
+class SimilarityContent : CheckManager.CheckHandler {
+    lateinit var chatContent: String
+    lateinit var profileManager: ProfileManager
+    private val responseData: MutableMap<String, String> = mutableMapOf()
+    override fun getContent(): String { return chatContent }
+    override fun getProfile(): ProfileManager { return profileManager }
+    override fun getResponseData(): MutableMap<String, String> { return responseData }
     companion object{
         const val BASE_RATIO = 0.7
         const val BASE_BUFFER = 2
@@ -17,6 +23,8 @@ class SimilarityContent : ChatEvent.CheckHandler {
         isAsync = false
     )
     override fun handle(profile: ProfileManager, content: String): Boolean {
+        chatContent = content
+        profileManager = profile
         if(content.length <= MIN_CONTENT_LENGTH) return true
         val contents = profile.getContents()
 
