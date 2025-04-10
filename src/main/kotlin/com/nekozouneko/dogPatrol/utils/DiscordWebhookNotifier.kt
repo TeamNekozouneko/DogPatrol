@@ -8,15 +8,13 @@ import java.io.OutputStreamWriter
 import java.net.URL
 
 class DiscordWebhookNotifier {
+    private val annotationManager = DogPatrol.getAnnotationManager()
     enum class NotifyType{
         Blocked(),
         Detected()
     }
-    private fun getPostData(check: CheckManager.CheckHandler, type: NotifyType) : String{
-        val kFunction = check::class.members.find { it.name == "handle" }
-        val annotation = kFunction?.annotations?.find { it is DogPatrol.CheckInfo } as? DogPatrol.CheckInfo
-        if(annotation == null) return ""
-
+    private fun getPostData(check: CheckManager.CheckHandler, type: NotifyType) : String?{
+        val annotation = annotationManager.getAnnotation(check::class) ?: return null
         if(type == NotifyType.Blocked){
             val responseValues = arrayListOf<String>()
             check.getResponseData().forEach { responseName, responseData ->
@@ -85,7 +83,7 @@ class DiscordWebhookNotifier {
             val requestUrl = config.getConfig().getString("webhook_url") ?: return@Runnable
 
             try{
-                val jsonData = getPostData(check, type)
+                val jsonData = getPostData(check, type) ?: return@Runnable
                 val conn = URL(requestUrl).openConnection()
                 conn.doOutput = true
                 conn.setRequestProperty("Content-Type", "application/json")

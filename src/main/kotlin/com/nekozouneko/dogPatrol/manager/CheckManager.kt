@@ -22,13 +22,7 @@ class CheckManager {
 
         val checks: ArrayList<CheckHandler> = Checks.get()
         for(check in checks){
-            val annotation = annotationManager.getAnnotation(check::class)
-            if(annotation == null){
-                DogPatrol.instance.logger.severe(check.toString())
-                DogPatrol.instance.logger.severe(annotationManager.toString())
-                continue
-            }
-
+            val annotation = annotationManager.getAnnotation(check::class) ?: continue
             if(!annotation.isAsync){
                 //Sync Process
                 if(check.handle(profile, e.message)) continue
