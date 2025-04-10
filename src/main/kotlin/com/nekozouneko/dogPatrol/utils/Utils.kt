@@ -82,9 +82,9 @@ class Utils {
                 }else if(
                     index-1 >= 0 && (
                         (char.code == 0xFF9E && canAttachDakuten.contains(stringBuilder[index-1])) ||
-                        (char.code == 0xFF9F && canAttachHandakuten.contains(stringBuilder[index-1])))
-                    )
-                {
+                        (char.code == 0xFF9F && canAttachHandakuten.contains(stringBuilder[index-1]))
+                            )
+                    ) {
                     //前の文字が濁点・半濁点がつけられる場合、濁点・半濁点は前文字につけたため削除
                     ""
                 }else{
