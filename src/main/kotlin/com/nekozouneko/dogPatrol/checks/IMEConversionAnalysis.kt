@@ -42,6 +42,7 @@ class IMEConversionAnalysis : CheckManager.CheckHandler{
         var replacedContent = RomaHiraConverter.convert(content.lowercase())
         replacedContent = replacedContent.replace(Regex("\\p{Punct}")  , "")
         replacedContent = replacedContent.replace(" ","").replace("　","")
+        replacedContent = Utils.HalfwidthKatakanaToHiragana(replacedContent)
         responseData["preprocessedContent"] = replacedContent
 
         //Tokenize

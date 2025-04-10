@@ -64,5 +64,34 @@ class Utils {
                 }
             }.joinToString("")
         }
+        fun HalfwidthKatakanaToHiragana(string: String): String{
+            val hiragana = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんぁぃぅぇぉっゃゅょゎ"
+            val halfwidthKatakana = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｯｬｭｮ"
+            val canAttachDakuten = "かきくけさしすせそたちつてとはひふへほ"
+            val canAttachHandakuten = "はひふへほ"
+            val map = halfwidthKatakana.zip(hiragana).toMap()
+            val stringBuilder = StringBuilder()
+            stringBuilder.append(string.map { map[it] ?: it }.joinToString(""))
+            return stringBuilder.mapIndexed { index, char ->
+                if(index+1 < stringBuilder.length && canAttachDakuten.contains(char) && stringBuilder[index+1].code == 0xFF9E) {
+                    //濁点がつけられる文字だったら、濁点をつける処理
+                    char + 0x01
+                }else if(index+1 < stringBuilder.length && canAttachHandakuten.contains(char) && stringBuilder[index+1].code == 0xFF9F) {
+                    //半濁点がつけられる文字だったら、半濁点をつける処理
+                    char + 0x02
+                }else if(
+                    index-1 >= 0 && (
+                        (char.code == 0xFF9E && canAttachDakuten.contains(stringBuilder[index-1])) ||
+                        (char.code == 0xFF9F && canAttachHandakuten.contains(stringBuilder[index-1])))
+                    )
+                {
+                    //前の文字が濁点・半濁点がつけられる場合、濁点・半濁点は前文字につけたため削除
+                    ""
+                }else{
+                    char
+                }
+            }.joinToString("")
+
+        }
     }
 }
