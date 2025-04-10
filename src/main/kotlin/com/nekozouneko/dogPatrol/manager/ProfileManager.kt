@@ -1,7 +1,6 @@
 package com.nekozouneko.dogPatrol.manager
 
 import net.md_5.bungee.api.connection.ProxiedPlayer
-import java.nio.Buffer
 import java.util.concurrent.ConcurrentHashMap
 
 class ProfileManager(private val player: ProxiedPlayer) {

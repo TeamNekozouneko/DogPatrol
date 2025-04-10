@@ -1,12 +1,7 @@
 package com.nekozouneko.dogPatrol.manager
 
 import com.nekozouneko.dogPatrol.DogPatrol
-import com.nekozouneko.dogPatrol.checks.ContainsBadwords
-import com.nekozouneko.dogPatrol.checks.DuplicateContent
-import com.nekozouneko.dogPatrol.checks.IMEConversionAnalysis
-import com.nekozouneko.dogPatrol.checks.SimilarityContent
 import com.nekozouneko.dogPatrol.utils.Utils
-import com.nekozouneko.dogPatrol.checks.*
 import com.nekozouneko.dogPatrol.models.Checks
 import com.nekozouneko.dogPatrol.utils.DiscordWebhookNotifier
 import net.md_5.bungee.api.event.ChatEvent

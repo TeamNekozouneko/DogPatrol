@@ -3,7 +3,6 @@ package com.nekozouneko.dogPatrol.utils
 import com.nekozouneko.dogPatrol.DogPatrol
 import com.nekozouneko.dogPatrol.manager.CheckManager
 import java.io.BufferedReader
-import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.URL

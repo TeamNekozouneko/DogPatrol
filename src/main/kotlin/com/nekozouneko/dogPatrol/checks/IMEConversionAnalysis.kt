@@ -15,8 +15,6 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlinx.coroutines.*
 import com.nekozouneko.dogPatrol.utils.RomaHiraConverter
-import net.md_5.bungee.api.ChatMessageType
-import net.md_5.bungee.api.chat.TextComponent
 
 class IMEConversionAnalysis : CheckManager.CheckHandler{
     lateinit var chatContent: String
