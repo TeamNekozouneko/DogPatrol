@@ -15,9 +15,12 @@ class ChatEvent : Listener {
 
         //Exclude Servers
         val player = e.sender as ProxiedPlayer
+        val currentServer = player.server.info.name
         val configFile = configurationManager.getConfig()
-        val excludeServers = configFile.getStringList("exclude_servers")
-        if(excludeServers.contains(player.server.info.name)) return
+        val regexExcludeServers = configFile.getStringList("exclude_servers").map { Regex(it) }
+        regexExcludeServers.forEach {
+            if(currentServer.matches(it)) return
+        }
 
         //Handle
         checkManager.check(e)
