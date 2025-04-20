@@ -1,4 +1,5 @@
 name: DogPatrol
-version: '1.0-SNAPSHOT'
+version: '${project.version}'
 main: com.nekozouneko.dogPatrol.DogPatrol
 author: RunQ
+description: チャットを自動で見守る番犬プラグイン
