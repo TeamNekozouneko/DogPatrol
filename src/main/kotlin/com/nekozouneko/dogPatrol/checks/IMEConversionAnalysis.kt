@@ -15,6 +15,7 @@ import java.net.URL
 import java.net.URLEncoder
 import kotlinx.coroutines.*
 import com.nekozouneko.dogPatrol.utils.RomaHiraConverter
+import kotlinx.coroutines.time.withTimeout
 
 class IMEConversionAnalysis : CheckManager.CheckHandler{
     lateinit var chatContent: String
@@ -25,6 +26,7 @@ class IMEConversionAnalysis : CheckManager.CheckHandler{
     override fun getResponseData(): MutableMap<String, String> { return responseData }
     companion object{
         const val CANDIDATE_DEPTH = 3
+        const val CALCULATION_TIMEOUT = 5 * 60 * 1000L
     }
     @DogPatrol.CheckInfo(
         checkName = "IMEConversionAnalysis",
@@ -69,7 +71,11 @@ class IMEConversionAnalysis : CheckManager.CheckHandler{
         //Calcultion all Morphological based Combination patterns
         val startedCalculationTime = System.currentTimeMillis()
         try {
-            val isCombinationPatternsBad = runBlocking { isCombinationPatternsBad(candidates) }
+            val isCombinationPatternsBad = runBlocking {
+                withTimeout(CALCULATION_TIMEOUT) {
+                    isCombinationPatternsBad(candidates)
+                }
+            }
             responseData["morphCalculationTime"] = "${( System.currentTimeMillis() - startedCalculationTime )}ms"
             if (isCombinationPatternsBad) return false
         }catch(_: Exception){}
