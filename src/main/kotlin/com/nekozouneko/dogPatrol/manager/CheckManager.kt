@@ -11,7 +11,6 @@ class CheckManager {
     private val discordWebhookNotifier = DiscordWebhookNotifier()
     private val annotationManager = DogPatrol.getAnnotationManager()
     private val configurationManager = DogPatrol.getConfigurationManager()
-    private val configFile = configurationManager.getConfig()
 
     interface CheckHandler {
         fun handle(profile: ProfileManager, content: String) : Boolean
@@ -28,7 +27,7 @@ class CheckManager {
 
             //Exclude Regex Check
             var isExcludeRegexFlag = false
-            val regexExcludes = configFile.getStringList("exclude_regex.${annotation.checkName}").map { Regex(it) }
+            val regexExcludes = configurationManager.getConfig().getStringList("exclude_regex.${annotation.checkName}").map { Regex(it) }
             if (regexExcludes.isNotEmpty()){
                 for (regex in regexExcludes){
                     if(!e.message.matches(regex)) continue
