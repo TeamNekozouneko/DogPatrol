@@ -7,5 +7,5 @@ exclude_servers: []
 # ::: EXAMPLE :::
 #exclude_regex:
 # DuplicateContent:
-#   - "^-?\d+(\.\d+)?$" #数字で構成される文字列かどうかを判定する正規表現
+#   - '^-?\d+(\.\d+)?$' #数字で構成される文字列かどうかを判定する正規表現
 exclude_regex:
