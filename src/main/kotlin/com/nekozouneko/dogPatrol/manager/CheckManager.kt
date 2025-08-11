@@ -10,6 +10,8 @@ class CheckManager {
     private val connectionManager = DogPatrol.getConnectionManager()
     private val discordWebhookNotifier = DiscordWebhookNotifier()
     private val annotationManager = DogPatrol.getAnnotationManager()
+    private val configurationManager = DogPatrol.getConfigurationManager()
+    private val configFile = configurationManager.getConfig()
 
     interface CheckHandler {
         fun handle(profile: ProfileManager, content: String) : Boolean
@@ -23,6 +25,20 @@ class CheckManager {
         val checks: ArrayList<CheckHandler> = Checks.get()
         for(check in checks){
             val annotation = annotationManager.getAnnotation(check::class) ?: continue
+
+            //Exclude Regex Check
+            var isExcludeRegexFlag = false
+            val regexExcludes = configFile.getStringList("exclude_regex.${annotation.checkName}").map { Regex(it) }
+            if (regexExcludes.isNotEmpty()){
+                for (regex in regexExcludes){
+                    if(!e.message.matches(regex)) continue
+                    isExcludeRegexFlag = true
+                    break
+                }
+            }
+            if(isExcludeRegexFlag) continue
+
+            //Check Process
             if(!annotation.isAsync){
                 //Sync Process
                 if(check.handle(profile, e.message)) continue
