@@ -1,2 +1,11 @@
 webhook_url: ""
 exclude_servers: []
+
+#[除外設定]
+#CheckNameごとに検出除外する正規表現を追加できます。
+#
+# ::: EXAMPLE :::
+#exclude_regex:
+# DuplicateContent:
+#   - "^-?\d+(\.\d+)?$" #数字で構成される文字列かどうかを判定する正規表現
+exclude_regex:
